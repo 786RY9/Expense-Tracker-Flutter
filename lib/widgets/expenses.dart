@@ -31,6 +31,7 @@ class _ExpensesState extends State<Expenses> {
 
   void _openAddExpenseOverlay() {
     showModalBottomSheet(
+      useSafeArea: true,
       isScrollControlled: true,
       context: context,
       builder: (ctx) => NewExpense(onAddExpense: _addExpense),
@@ -68,6 +69,8 @@ class _ExpensesState extends State<Expenses> {
 
   @override
   Widget build(context) {
+    final width = MediaQuery.of(context).size.width;
+
     Widget mainContent = Center(
       child: Text('No expenses found. Start adding some!'),
     );
@@ -90,13 +93,21 @@ class _ExpensesState extends State<Expenses> {
         ],
       ),
 
-      body: Column(
-        children: [
-          // Toolbar with Add button => Row()
-          Chart(expenses: _registeredExpenses),
-          Expanded(child: mainContent),
-        ],
-      ),
+      body:
+          width < 600
+              ? Column(
+                children: [
+                  // Toolbar with Add button => Row()
+                  Chart(expenses: _registeredExpenses),
+                  Expanded(child: mainContent),
+                ],
+              )
+              : Row(
+                children: [
+                  Expanded(child: Chart(expenses: _registeredExpenses)),
+                  Expanded(child: mainContent),
+                ],
+              ),
     );
   }
 }
@@ -104,8 +115,9 @@ class _ExpensesState extends State<Expenses> {
 class ExpenseBucket {
   const ExpenseBucket({required this.category, required this.expenses});
 
-  ExpenseBucket.forCategory(List<Expense> allExpenses, this.category) : expenses = allExpenses.where((expense)=> expense.category == category).toList() ;
-
+  ExpenseBucket.forCategory(List<Expense> allExpenses, this.category)
+    : expenses =
+          allExpenses.where((expense) => expense.category == category).toList();
 
   final Category category;
   final List<Expense> expenses;
